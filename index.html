@@ -1,0 +1,581 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Pirinola</title>
+<link rel="icon" href="logo.png">
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@700;800;900&display=swap" rel="stylesheet">
+<style>
+  :root {
+    color-scheme: dark;
+    --page: #0e0f2d; 
+    --page-2: #1a1c4a; 
+    --surface: #23272a; 
+    --surface-2: #2c2f33; 
+    --border: #7d8392;
+    --snow: #ffffff; 
+    --fog: #babcd9; 
+    --cta: #5865f2; 
+    --cta-hover: #3442d9; 
+    --ink-dark: #23272a;
+    --body: #fbe6d6; 
+    --body-top: #fdf0e4; 
+    --band1: #f7c96a; 
+    --band2: #f2928a; 
+    --tip1: #a9c6f5; 
+    --tip2: #7fa6ea;
+    --stick: #f2928a; 
+    --knob: #f7c96a;
+    --display: "Nunito", ui-rounded, system-ui, sans-serif;
+  }
+
+  * { 
+    box-sizing: border-box; 
+  }
+
+  html, body { height: 100%; }
+  body { 
+    margin: 0; 
+    color: var(--snow); 
+    background: var(--page);
+    background-image: radial-gradient(ellipse at 50% 35%, var(--page-2), var(--page) 70%);
+    font: 16px/1.5 var(--display); 
+    letter-spacing: .013em;
+    display: flex; 
+    flex-direction: column; 
+    align-items: center; 
+    justify-content: center; 
+    padding-block: 16px;
+    padding-left: max(16px, env(safe-area-inset-left, 0px)); 
+    padding-right: max(16px, env(safe-area-inset-right, 0px)); 
+  }
+  
+  :focus-visible { 
+    outline: 3px solid var(--cta); 
+    outline-offset: 3px; 
+  }
+
+  .logo { 
+    position: fixed; 
+    top: calc(16px + env(safe-area-inset-top, 0px)); 
+    left: max(16px, env(safe-area-inset-left, 0px));
+    z-index: 10; 
+    width: 52px; 
+    height: 52px; 
+    padding: 8px; 
+    border: 0; 
+    border-radius: 12px; 
+    background: transparent; 
+    cursor: pointer; 
+    transition: background .15s; 
+  }
+
+  .logo:hover { 
+    background: rgba(255,255,255,.08); 
+  }
+
+  .logo img { 
+    width: 100%; 
+    height: 100%; 
+    display: block; 
+  }
+  
+  .logo .pencil { 
+    position: absolute; 
+    right: -4px; 
+    bottom: -4px; 
+    width: 22px; 
+    height: 22px; 
+    padding: 4px; 
+    border-radius: 50%;
+    background: var(--cta); 
+    color: var(--snow); 
+    box-shadow: 0 0 0 2px var(--page); 
+  }
+
+  .stage { 
+    width: 100%; 
+    max-width: 420px; 
+    height: 440px; 
+    perspective: 1000px; 
+    position: relative; 
+  }
+
+  .scene { 
+    position: absolute; 
+    inset: 0;
+    transform-style: preserve-3d; 
+    transform: rotateX(-16deg); 
+  }
+
+  .shadow { 
+    position: absolute; 
+    left: 50%; 
+    top: 66%; 
+    width: 240px; 
+    height: 240px; 
+    margin: -120px 0 0 -120px;
+    border-radius: 50%; 
+    background: radial-gradient(rgba(0,0,0,.55), transparent 62%); 
+    filter: blur(6px);
+    transform: rotateX(90deg); 
+  }
+
+  .top { 
+    position: absolute; 
+    left: 50%; 
+    top: 42%; 
+    width: 0; 
+    height: 0; 
+    transform-style: preserve-3d; 
+  }
+
+  .top > div { 
+    position: absolute; 
+    backface-visibility: hidden; 
+  }
+
+  .side { 
+    border-radius: 10px; 
+    display: flex; 
+    align-items: center; 
+    justify-content: center;
+    text-align: center; 
+    padding: 12px 14px 24px; 
+    font-weight: 900; 
+    font-size: 20px; 
+    line-height: 1.1;
+    color: #6b4a40; 
+    overflow-wrap: anywhere; 
+    hyphens: auto;
+    background:
+      linear-gradient(to bottom, rgba(255,255,255,.55), rgba(255,255,255,0) 45%),
+      linear-gradient(to bottom, transparent 0 87%, var(--band1) 87% 91%, var(--band2) 91% 100%),
+      var(--body); 
+    }
+
+  .side.win { 
+    box-shadow: inset 0 0 0 5px rgba(255,255,255,.95); 
+  }
+  .cap { 
+    background: radial-gradient(circle at 45% 40%, #fff, var(--body-top) 55%, var(--body));
+    clip-path: polygon(25% 0, 75% 0, 100% 50%, 75% 100%, 25% 100%, 0 50%); 
+  }
+
+  .tip { 
+    background: linear-gradient(to bottom, var(--tip1), var(--tip2));
+    clip-path: polygon(0 0, 100% 0, 50% 100%); transform-origin: 50% 0; 
+  }
+
+  .handle { 
+    background: linear-gradient(to right, rgba(255,255,255,.35), transparent), var(--stick); 
+    border-radius: 8px 8px 0 0; 
+  }
+
+  .knob { 
+    background: radial-gradient(circle at 40% 40%, #fff6d8, var(--knob) 60%);
+    clip-path: polygon(25% 0, 75% 0, 100% 50%, 75% 100%, 25% 100%, 0 50%); 
+  }
+
+  button { 
+    font: inherit; 
+    letter-spacing: .016em; 
+  }
+  .btn { 
+    border: 0; 
+    border-radius: 12px; 
+    padding: 15px 24px; 
+    font-weight: 800; 
+    cursor: pointer; 
+    transition: background .15s; 
+  }
+
+  .btn-primary { 
+    background: var(--cta); 
+    color: var(--snow); 
+    padding: 19.5px 24px; 
+  }
+
+  .btn-primary:hover:not(:disabled) { 
+    background: var(--cta-hover); 
+  }
+
+  .btn-secondary { 
+    background: var(--snow); 
+    color: var(--ink-dark); 
+  }
+
+  .btn:disabled { 
+    opacity: .5; 
+    cursor: default; 
+  }
+
+  .spin { 
+    margin-top: 8px; 
+    min-width: 200px; 
+    font-size: 1.25rem; 
+    text-transform: uppercase; 
+  }
+
+  h2 { 
+    font-weight: 900; 
+    text-transform: uppercase; 
+    letter-spacing: -.01em; 
+    line-height: .95; 
+    margin: 0; 
+    text-wrap: balance; }
+
+  dialog { 
+    border: 0; 
+    color: var(--snow); 
+    background: var(--surface); 
+    padding: 0; 
+  }
+
+  dialog::backdrop { 
+    background: rgba(5,6,20,.45); 
+  }
+
+  #result { 
+    border-radius: 24px; 
+    padding: 32px; 
+    text-align: center; 
+    width: min(90vw, 380px); 
+  }
+
+  #result[open] { 
+    animation: pop .35s cubic-bezier(.2,1.4,.4,1); 
+  }
+
+  @keyframes pop { 
+    from { 
+    transform: scale(.85); 
+    opacity: 0; 
+  } 
+}
+
+  #result p { 
+    margin: 0 0 12px; 
+    color: var(--fog); 
+    text-transform: uppercase; 
+    font-weight: 800; 
+    font-size: .85rem; 
+    letter-spacing: .08em; 
+  }
+
+    #result h2 { 
+    font-size: 2.6rem; 
+    margin-bottom: 28px; 
+    overflow-wrap: anywhere; 
+  }
+
+  #result form { 
+    display: flex; 
+    gap: 12px; 
+    justify-content: center; 
+    flex-wrap: wrap; 
+  }
+
+  #settings { 
+    margin: 0; 
+    height: 100%; 
+    max-height: 100%; 
+    width: min(100vw, 380px); 
+    border-radius: 0 24px 24px 0;
+    padding: calc(24px + env(safe-area-inset-top, 0px)) 24px 24px max(24px, env(safe-area-inset-left, 0px)); 
+  }
+
+  #settings[open] { 
+    display: flex; 
+    flex-direction: column; 
+    gap: 24px; 
+    animation: slide .3s ease-out; 
+  }
+
+  @keyframes slide { 
+    from { 
+      transform: translateX(-100%); 
+  } 
+}
+
+  .sheet-head { 
+    display: flex; 
+    align-items: center; 
+    gap: 12px; 
+  }
+
+  .sheet-head img { 
+    width: 36px; 
+    height: 36px; 
+  }
+
+  .sheet-head h2 { 
+    font-size: 1.6rem; 
+    flex: 1; 
+  }
+
+  .close { 
+    width: 40px; 
+    height: 40px; 
+    border-radius: 12px; 
+    border: 1px solid var(--border); 
+    background: transparent; 
+    color: var(--snow);
+    font-size: 1.4rem; 
+    line-height: 1; 
+    cursor: pointer; 
+  }
+
+  .close:hover { 
+    background: var(--surface-2); 
+  }
+
+  .hint { 
+    margin: -12px 0 0; 
+    color: var(--fog); 
+  }
+
+  .labels { 
+    display: grid; 
+    gap: 12px; 
+  }
+
+  .labels label { 
+    display: grid; 
+    grid-template-columns: 2rem 1fr; 
+    align-items: center; 
+    gap: 12px; 
+    color: var(--fog); 
+    font-weight: 800; 
+  }
+
+  .labels span { 
+    width: 2rem; 
+    height: 2rem; 
+    border-radius: 12px; 
+    display: grid; 
+    place-items: center; 
+    background: var(--surface-2); 
+  }
+
+  .labels input { 
+    min-width: 0; 
+    font: inherit; 
+    padding: 12px 14px; 
+    border: 1px solid var(--border); 
+    border-radius: 12px;
+    background: var(--surface-2); 
+    color: var(--snow); 
+    outline: none; 
+  }
+    
+  .labels input:focus { 
+    border-color: var(--cta); 
+  }
+
+  .reset { 
+    align-self: flex-start; 
+    border: 1px solid var(--border); 
+    background: transparent; 
+    color: var(--snow); 
+  }
+
+  .reset:hover { 
+    background: var(--surface-2); 
+  }
+
+  @media (prefers-reduced-motion: reduce) { 
+    #result[open], 
+    #settings[open] { 
+      animation: none; 
+    } 
+  }
+
+</style>
+</head>
+<body>
+<button class="logo" id="logoBtn" aria-label="Personalizar caras" aria-haspopup="dialog">
+  <img src="logo.png" alt="">
+  <svg class="pencil" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+    <path d="M4 20h4L19 9a2.8 2.8 0 0 0-4-4L4 16v4z"/>
+    <path d="M13.5 6.5l4 4"/>
+  </svg>
+</button>
+
+<div class="stage" id="stage" aria-hidden="true">
+  <div class="scene">
+    <div class="shadow"></div>
+    <div class="top" id="top"></div>
+  </div>
+</div>
+<button class="btn btn-primary spin" id="spinBtn">Girar</button>
+
+<dialog id="settings" aria-labelledby="settingsTitle">
+  <div class="sheet-head">
+    <img src="logo.png" alt="">
+    <h2 id="settingsTitle">Personalizar caras</h2>
+    <form method="dialog"><button class="close" aria-label="Cerrar">×</button></form>
+  </div>
+  <p class="hint">Escribe el mensaje de cada cara.</p>
+  <div class="labels" id="labels"></div>
+  <button class="btn reset" id="resetBtn" type="button">Restablecer caras</button>
+</dialog>
+
+<dialog id="result" aria-labelledby="resultLabel resultText">
+  <p id="resultLabel">Cayó en</p>
+  <h2 id="resultText"></h2>
+  <form method="dialog">
+    <button class="btn btn-secondary" value="close">Cerrar</button>
+    <button class="btn btn-primary" value="again" autofocus>Girar otra vez</button>
+  </form>
+</dialog>
+
+<script>
+const DEFAULTS = ['Toma uno', 'Toma dos', 'Toma todo', 'Pon uno', 'Pon dos', 'Todos ponen'];
+const S = 110, H = 150, A = S * Math.sqrt(3) / 2, D = 110;
+const HS = 16, HH = 70, HA = HS * Math.sqrt(3) / 2;
+const TILT = Math.atan(A / D);
+const LIGHT = norm([-0.4, -0.8, 0.45]);
+const rad = d => d * Math.PI / 180, deg = r => r * 180 / Math.PI;
+function norm(v) { const l = Math.hypot(...v); return v.map(x => x / l); }
+
+let labels;
+try { labels = JSON.parse(localStorage.getItem('pirinola-labels')); } catch {}
+if (!Array.isArray(labels) || labels.length !== 6) labels = [...DEFAULTS];
+
+const body3d = document.getElementById('top');
+const parts = []; 
+function add(cls, w, h, left, topPx, transform, n) {
+  const el = document.createElement('div');
+  el.className = cls;
+  Object.assign(el.style, { width: w + 'px', height: h + 'px', left: left + 'px', top: topPx + 'px', transform });
+  body3d.appendChild(el);
+  parts.push({ el, n });
+  return el;
+}
+
+const sides = [];
+for (let i = 0; i < 6; i++) {
+  const a = i * 60, s = Math.sin(rad(a)), c = Math.cos(rad(a));
+  const el = add('side', S, H, -S / 2, -H / 2, `rotateY(${a}deg) translateZ(${A}px)`, [s, 0, c]);
+  sides.push(el);
+  add('tip', S, Math.hypot(A, D), -S / 2, 0,
+    `rotateY(${a}deg) translateZ(${A}px) translateY(${H / 2}px) rotateX(${-deg(TILT)}deg)`,
+    [s * Math.cos(TILT), Math.sin(TILT), c * Math.cos(TILT)]);
+  add('handle', HS, HH, -HS / 2, -HH / 2,
+    `translateY(${-(H / 2 + HH / 2)}px) rotateY(${a}deg) translateZ(${HA}px)`, [s, 0, c]);
+}
+
+function setLabel(i) {
+  const t = labels[i];
+  sides[i].textContent = t;
+  sides[i].style.fontSize = t.length <= 12 ? '20px' : t.length <= 24 ? '16px' : '13px';
+}
+
+sides.forEach((_, i) => setLabel(i));
+add('cap', 2 * S, S * Math.sqrt(3), -S, -S * Math.sqrt(3) / 2, `rotateX(90deg) translateZ(${H / 2}px)`, [0, -1, 0]);
+add('knob', 2 * HS, HS * Math.sqrt(3), -HS, -HS * Math.sqrt(3) / 2, `rotateX(90deg) translateZ(${H / 2 + HH}px)`, [0, -1, 0]);
+
+function pose({ spin = 0, wobble = 0, prec = 0, fall = 0, drop = 0 }) {
+  const t = `translateY(${drop}px) rotateZ(${-fall}deg) rotateY(${prec}deg) rotateX(${wobble}deg) rotateY(${-prec}deg) rotateY(${spin}deg)`;
+  body3d.style.transform = t;
+  const m = new DOMMatrix(t);
+  for (const p of parts) {
+    const w = worldNormal(m, p.n);
+    const lit = w[0] * LIGHT[0] + w[1] * LIGHT[1] + w[2] * LIGHT[2];
+    p.el.style.filter = `brightness(${(0.84 + 0.22 * Math.max(0, lit)).toFixed(3)})`;
+  }
+  return m;
+}
+function worldNormal(m, n) {
+  const p = m.transformPoint(new DOMPoint(n[0], n[1], n[2])), o = m.transformPoint(new DOMPoint(0, 0, 0));
+  return [p.x - o.x, p.y - o.y, p.z - o.z];
+}
+
+const easeOut = t => 1 - Math.pow(1 - t, 3);
+function bounce(t) { 
+  const n = 7.5625, d = 2.75;
+  if (t < 1 / d) return n * t * t;
+  if (t < 2 / d) return n * (t -= 1.5 / d) * t + 0.75;
+  if (t < 2.5 / d) return n * (t -= 2.25 / d) * t + 0.9375;
+  return n * (t -= 2.625 / d) * t + 0.984375;
+}
+const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+let spinning = false, current = 0;
+const btn = document.getElementById('spinBtn');
+
+function spin() {
+  if (spinning) return;
+  spinning = true; btn.disabled = true;
+  sides.forEach(s => s.classList.remove('win'));
+  const win = Math.floor(Math.random() * 6);
+  const start = ((current % 360) + 360) % 360;
+  const target = 90 - win * 60;
+  const total = 360 * (6 + Math.floor(Math.random() * 4)) + (((target - start) % 360) + 360) % 360;
+  const T1 = reduced ? 300 : 3800, T2 = reduced ? 200 : 900;
+  const dropMax = H / 2 + D - A;
+  const t0 = performance.now();
+
+  requestAnimationFrame(function frame(now) {
+    const e = now - t0;
+    if (e < T1) {
+      const t = e / T1;
+      current = start + total * easeOut(t);
+      pose({ spin: current, wobble: 14 * t * t, prec: 900 * t });
+      return requestAnimationFrame(frame);
+    }
+    current = start + total;
+    const f = Math.min(1, (e - T1) / T2), b = bounce(f);
+    const m = pose({ spin: current, wobble: 14 * (1 - f), prec: 900, fall: 90 * b, drop: dropMax * b });
+    if (f < 1) return requestAnimationFrame(frame);
+
+    const up = sides.map((_, i) => worldNormal(m, [Math.sin(rad(i * 60)), 0, Math.cos(rad(i * 60))])[1]);
+    console.assert(up.indexOf(Math.min(...up)) === win, 'face up mismatch', up, win);
+
+    sides[win].classList.add('win');
+    spinning = false; btn.disabled = false;
+    document.getElementById('resultText').textContent = labels[win];
+    setTimeout(() => dialog.showModal(), reduced ? 0 : 250);
+  });
+}
+
+const dialog = document.getElementById('result');
+dialog.addEventListener('close', () => {
+  if (dialog.returnValue === 'again') spin();
+  else pose({ spin: current }); 
+});
+btn.addEventListener('click', spin);
+const settings = document.getElementById('settings');
+document.getElementById('logoBtn').addEventListener('click', () => settings.showModal());
+settings.addEventListener('click', e => { 
+  const r = settings.getBoundingClientRect();
+  if (e.clientX > r.right || e.clientX < r.left || e.clientY < r.top || e.clientY > r.bottom) settings.close();
+});
+
+const box = document.getElementById('labels');
+labels.forEach((text, i) => {
+  const lab = document.createElement('label');
+  lab.innerHTML = `<span>${i + 1}</span>`;
+  const input = document.createElement('input');
+  input.value = text; input.maxLength = 40; input.placeholder = DEFAULTS[i];
+  input.setAttribute('aria-label', `Cara ${i + 1}`);
+  input.addEventListener('input', () => {
+    labels[i] = input.value.trim() || DEFAULTS[i];
+    setLabel(i);
+    try { localStorage.setItem('pirinola-labels', JSON.stringify(labels)); } catch {}
+  });
+  lab.appendChild(input);
+  box.appendChild(lab);
+});
+
+document.getElementById('resetBtn').addEventListener('click', () => {
+  labels = [...DEFAULTS];
+  box.querySelectorAll('input').forEach((input, i) => { input.value = labels[i]; setLabel(i); });
+  try { localStorage.removeItem('pirinola-labels'); } catch {}
+});
+
+pose({ spin: 0 });
+</script>
+</body>
+</html>
